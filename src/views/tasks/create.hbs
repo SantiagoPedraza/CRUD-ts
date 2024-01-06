@@ -1,0 +1,26 @@
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h4>Create a Task</h4>
+                </div>
+                <div class="card-body">
+                    <form action="/tasks/create" method="post">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" name="title" id="title" placeholder="Write your title" class="form-control" autofocus required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <input type="text" name="description" id="description" placeholder="Write a description" class="form-control" required>
+                        </div>
+                        <button type="submit" class="btn btn-success btn-block">
+                            Save
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
