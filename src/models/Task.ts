@@ -1,18 +1,30 @@
 // models/Task.ts
+import { Schema, model, Document } from 'mongoose';
 
-import { Schema, model } from 'mongoose';
+export interface ITask extends Document {
+    title: string;
+    description: string;
+    toPlainObject: () => Record<string, any>; // Definimos el tipo del método
+}
 
-const TaskSchema = new Schema({
+const taskSchema = new Schema({
     title: {
         type: String,
         required: true,
-        lowercase: true // Corregí el nombre del atributo "lowecase" a "lowercase"
+        lowercase: true,
     },
     description: {
         type: String,
         required: true,
-        lowercase: true // Corregí el nombre del atributo "lowecase" a "lowercase"
-    }
+        lowercase: true,
+    },
 });
 
-export default model('Task', TaskSchema);
+// Agregamos un método toPlainObject al esquema
+taskSchema.methods.toPlainObject = function (): Record<string, any> {
+    const { _id, ...object } = this.toObject();
+    object._id = _id.toString();
+    return object;
+};
+
+export default model<ITask>('Task', taskSchema);

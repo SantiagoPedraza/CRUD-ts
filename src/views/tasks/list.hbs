@@ -1,17 +1,60 @@
 <div class="row">
     {{#each tasks}}
-    <div class="col-md-3">
-        <div class="card">
-            <div class="card-body">
-                <h3>{{title}}</h3>
-                <p>{{description}}</p>
-            </div>
-            <div class="card-footer d-flex justify-content-between aling-items-center">
-                
-
+        <div class="col-md-3 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h3>{{#if title}}{{title}}{{else}}Title Not Found{{/if}}</h3>
+                    <p>{{#if description}}{{description}}{{else}}Description Not Found{{/if}}</p>
+                    <p>Quantity: {{#if quantity}}{{quantity}}{{else}}Not Specified{{/if}}</p>
+                    
+                </div>
+                <div class="card-footer d-flex justify-content-between align-items-center">
+                    <a href="" class="btn btn-danger delete-button" data-id="{{_id}}">
+                        delete
+                    </a>
+                    <a href="/tasks/edit/{{_id}}" class="btn btn-secondary">
+                        edit
+                    </a>
+                </div>
             </div>
         </div>
-    </div>
     {{/each}}
-</div>
 
+    <!-- Agrega este script al final de tu archivo list.hbs -->
+    <!-- ... (Otras partes de list.hbs) -->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const deleteButtons = document.querySelectorAll('.delete-button');
+
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', async function (event) {
+                    event.preventDefault();
+
+                    const confirmDelete = confirm('¿Estás seguro de que quieres eliminar esta tarea?');
+
+                    if (confirmDelete) {
+                        const taskId = button.getAttribute('data-id');
+                        const deleteUrl = `/tasks/delete/${taskId}`;
+
+                        try {
+                            const response = await fetch(deleteUrl, {
+                                method: 'DELETE',
+                            });
+
+                            if (response.ok) {
+                                // Eliminar la tarea del DOM sin recargar la página
+                                button.closest('.col-md-3').remove();
+                            } else {
+                                console.error('Error al eliminar la tarea. Status:', response.status);
+                            }
+                        } catch (error) {
+                            console.error('Error de red:', error);
+                        }
+                    }
+                });
+            });
+        });
+    </script>
+
+</div>
