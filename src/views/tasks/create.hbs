@@ -3,28 +3,42 @@
         <div class="col-md-6">
             <div class="card">
                 <div class="card-header text-center">
-                    <h4>Create a Task</h4>
+                    <h4>Ingrese un producto</h4>
                 </div>
                 <div class="card-body">
                     <form action="/tasks/create" method="post">
                         <div class="mb-3">
-                            <label for="title" class="form-label">Title</label>
+                            <label for="title" class="form-label">Nombre</label>
                             <input type="text" name="title" id="title" placeholder="Write your title" class="form-control" autofocus required>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label">Description</label>
+                            <label for="description" class="form-label">Descripcion</label>
                             <input type="text" name="description" id="description" placeholder="Write a description" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="price" class="form-label">Price</label>
+                            <label for="category" class="form-label">Categoria</label>
+                            <select name="category" id="category" class="form-control" required>
+                                <option value="category1">Category 1</option>
+                                <option value="category2">Category 2</option>
+                                <!-- Agrega más opciones según tus categorías -->
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Cantidad</label>
+                            <input type="number" name="quantity" id="quantity" placeholder="Enter the quantity" class="form-control" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Precio</label>
                             <input type="number" name="price" id="price" placeholder="Enter the price" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="quantity" class="form-label">Quantity</label>
-                            <input type="number" name="quantity" id="quantity" placeholder="Enter the quantity" class="form-control" required>
+                            <label for="image" class="form-label">Imagen</label>
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*">
                         </div>
+
+                        
                         <button type="submit" class="btn btn-success btn-block">
-                            Save
+                            Guardar
                         </button>
                     </form>
                 </div>

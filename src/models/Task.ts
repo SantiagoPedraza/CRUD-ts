@@ -4,7 +4,10 @@ import { Schema, model, Document } from 'mongoose';
 export interface ITask extends Document {
     title: string;
     description: string;
-    toPlainObject: () => Record<string, any>; // Definimos el tipo del método
+    category: string;
+    quantity: number;
+    price: number; // Agrega el campo price
+    toPlainObject: () => Record<string, any>;
 }
 
 const taskSchema = new Schema({
@@ -18,9 +21,21 @@ const taskSchema = new Schema({
         required: true,
         lowercase: true,
     },
+    category: {
+        type: String,
+        required: true,
+        lowercase: true,
+    },
+    quantity: {
+        type: Number,
+        default: 0,
+    },
+    price: {
+        type: Number, // Tipo de dato para el precio
+        required: true, // Indica que el precio es obligatorio
+    },
 });
 
-// Agregamos un método toPlainObject al esquema
 taskSchema.methods.toPlainObject = function (): Record<string, any> {
     const { _id, ...object } = this.toObject();
     object._id = _id.toString();
