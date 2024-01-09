@@ -3,16 +3,21 @@ import express from 'express';
 import exphbs, { create } from 'express-handlebars';
 import path from 'path';
 import indexRoutes from './routes';
-import tasksRouter from './routes/tasks'; // Cambiado el nombre para evitar conflictos
+import tasksRouter from './routes/tasks';
+import mongoose from 'mongoose';
+import Database from './database';
 
 class Application {
     app: express.Application;
+    database: Database;
 
     constructor() {
         this.app = express();
+        this.database = Database.getInstance();
         this.settings();
         this.middlewares();
         this.routes();
+        this.database.connect();
     }
 
     settings() {

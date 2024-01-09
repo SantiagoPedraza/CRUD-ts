@@ -1,58 +1,86 @@
 // routes/tasks.ts
-import { Router, Request, Response } from 'express';
+import express, { Router, Request, Response } from 'express';
+import multer from 'multer';
+import path from 'path';
 import Task, { ITask } from '../models/Task';
 
 const tasksRouter = Router();
+const upload = multer({ dest: 'uploads/' }); // Ajusta la carpeta de destino según tus necesidades
+
+const publicPath = path.join(__dirname, 'public'); // Reemplaza 'public' con tu directorio de archivos estáticos
+
+tasksRouter.use(express.urlencoded({ extended: true }));
+tasksRouter.use(express.json());
+tasksRouter.use(express.static(publicPath));
 
 tasksRouter.route('/create')
-    .get((req: Request, res: Response) => {
-        res.render('tasks/create');
+    .get(async (req: Request, res: Response) => {
+        try {
+            // Obtén todas las categorías únicas
+            const uniqueCategories = await Task.distinct('category');
+
+            res.render('tasks/create', { uniqueCategories });
+        } catch (error) {
+            console.error('Error al obtener las categorías:', error);
+            res.status(500).send('Error interno del servidor');
+        }
     })
-    .post(async (req: Request, res: Response) => {
+    .post(upload.single('image'), async (req: Request, res: Response) => {
         const { title, description, category, quantity, price } = req.body;
+        const image = req.file ? req.file.path : undefined; // Obtén la ruta de la imagen si existe
 
         try {
-            // Añade la validación para el campo 'price'
             if (!title || !description || !category || !quantity || !price) {
                 return res.status(400).send('Todos los campos son requeridos');
             }
 
-            const newTask = new Task({ title, description, category, quantity, price });
+            const newTask = new Task({ title, description, category, quantity, price, image });
             await newTask.save();
             res.redirect('/tasks/list');
         } catch (error) {
             console.error('Error al crear la tarea:', error);
             res.status(500).send('Error interno del servidor');
         }
-    });
+        });
 
-tasksRouter.route('/list')
+    tasksRouter.route('/list')
     .get(async (req: Request, res: Response) => {
         try {
             const { categoryFilter } = req.query;
-            let tasks;
 
-            if (categoryFilter) {
-                tasks = await Task.find({ category: categoryFilter });
-            } else {
-                tasks = await Task.find();
+            // Obtén todas las tareas
+            const tasks = await Task.find();
+
+            // Obtén categorías únicas de todas las tareas
+            const uniqueCategories = [...new Set(tasks.map(task => task.category))];
+
+            // Si hay un filtro por categoría, filtra las tareas
+            let filteredTasks = tasks;
+            if (categoryFilter && categoryFilter !== 'all') {
+                filteredTasks = tasks.filter(task => task.category === categoryFilter);
             }
 
-            const tasksAsPlainObjects = tasks.map(task => task.toObject());
+            // Convierte las tareas y las categorías a objetos planos
+            const tasksAsPlainObjects = filteredTasks.map(task => task.toObject());
 
-            res.render('tasks/list', { tasks: tasksAsPlainObjects, selectedCategory: categoryFilter });
+            res.render('tasks/list', {
+                tasks: tasksAsPlainObjects,
+                selectedCategory: categoryFilter,
+                uniqueCategories,
+            });
         } catch (error) {
             console.error('Error al obtener las tareas:', error);
             res.status(500).send('Error interno del servidor');
         }
     });
 
+
 tasksRouter.route('/delete/:id')
     .delete(async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
             await Task.findByIdAndDelete(id);
-            res.sendStatus(204); // No Content
+            res.sendStatus(204);
         } catch (error) {
             console.error('Error al eliminar la tarea:', error);
             res.status(500).send('Error interno del servidor');
@@ -75,7 +103,7 @@ tasksRouter.route('/edit/:id')
             res.status(500).send('Error interno del servidor');
         }
     })
-     .post(async (req: Request, res: Response) => {
+    .post(async (req: Request, res: Response) => {
         const { id } = req.params;
         const { title, description, category, quantity, price } = req.body;
         await Task.findByIdAndUpdate(id, { title, description, category, quantity, price });

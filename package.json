@@ -12,7 +12,10 @@
     "license": "ISC",
     "devDependencies": {
         "@types/express-handlebars": "^5.3.1",
+        "@types/mongoose": "^5.11.97",
         "@types/morgan": "^1.9.9",
+        "@types/multer": "^1.4.11",
+        "@types/uuid": "^9.0.7",
         "nodemon": "^3.0.2",
         "ts-node": "^10.9.2",
         "typescript": "^5.3.3"
@@ -21,8 +24,9 @@
         "@types/express": "^4.17.21",
         "express": "^4.18.2",
         "express-handlebars": "^5.3.5",
-        "mongoose": "^8.0.3",
+        "mongoose": "^8.0.4",
         "morgan": "^1.10.0",
+        "multer": "^1.4.5-lts.1",
         "rimraf": "^5.0.5"
     }
 }

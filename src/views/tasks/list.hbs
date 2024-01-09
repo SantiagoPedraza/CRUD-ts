@@ -7,18 +7,15 @@
     {{#each tasks}}
         <div class="col-md-3 mb-4" data-id="{{_id}}" data-category="{{category}}">
             <div class="card">
-                <!-- Agrega la imagen en la parte superior de la tarjeta -->
-                <img src="{{image}}" alt="Imagen de la tarea" class="card-img-top">
+                <img src="data:image/jpeg;base64,chorizo" alt="Imagen del producto" class="card-img-top">
                 <div class="card-body">
                     <h3>{{#if title}}{{title}}{{else}}Title Not Found{{/if}}</h3>
                     <p>{{#if description}}{{description}}{{else}}Description Not Found{{/if}}</p>
                     <p>Cantidad: <span class="quantity" data-id="{{_id}}">{{quantity}}</span></p>
                     <p>Precio: $<span class="price" data-id="{{_id}}">{{price}}</span></p>
-
-                    <!-- Agrega el botón de Detalle -->
                     <button class="btn btn-primary detail-button" data-bs-toggle="modal" data-bs-target="#detailModal{{_id}}">Detalle</button>
-                    <button class="btn btn-success quantity-increment" data-id="{{_id}}">Incrementar Cantidad</button>
-                    <button class="btn btn-warning quantity-decrement" data-id="{{_id}}">Decrementar Cantidad</button>
+                    <button class="btn btn-success quantity-increment" data-id="{{_id}}">+</button>
+                    <button class="btn btn-warning quantity-decrement" data-id="{{_id}}">-</button>
                 </div>
             </div>
         </div>
@@ -264,7 +261,7 @@
 <style>
     .card {
         border: 1px solid #ddd;
-        border-radius: 15px; /* Aumenté el radio para hacer los bordes más redondeados */
+        border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
     }
@@ -290,19 +287,18 @@
 
     .card-footer {
         padding: 10px;
-        background-color: #343a40; /* Cambié el color del fondo para que combine mejor */
+        background-color: #343a40;
         border-top: 1px solid #ddd;
-        border-bottom-left-radius: 15px; /* Aumenté el radio para hacer los bordes más redondeados */
-        border-bottom-right-radius: 15px; /* Aumenté el radio para hacer los bordes más redondeados */
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
     }
 
     .card-footer a,
     .card-footer button {
         margin-right: 10px;
-        border-radius: 8px; /* Aumenté el radio para hacer los bordes más redondeados */
+        border-radius: 8px;
     }
 
-    /* Agregué reglas para los colores de los botones en los diferentes estados */
     .card-footer a.btn-primary,
     .card-footer button.btn-primary {
         color: #fff;
@@ -340,5 +336,14 @@
     .card-footer button.btn-warning:hover {
         background-color: #d39e00;
         border-color: #d39e00;
+    }
+
+    #taskTable {
+        color: #fff;
+    }
+
+    #taskTable th,
+    #taskTable td {
+        color: #fff;
     }
 </style>

@@ -6,37 +6,45 @@
                     <h4>Ingrese un producto</h4>
                 </div>
                 <div class="card-body">
-                    <form action="/tasks/create" method="post">
+                    <form action="/tasks/create" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="title" class="form-label">Nombre</label>
-                            <input type="text" name="title" id="title" placeholder="Write your title" class="form-control" autofocus required>
+                            <input type="text" name="title" id="title" placeholder="Ingrese el nombre" class="form-control" autofocus required>
                         </div>
                         <div class="mb-3">
-                            <label for="description" class="form-label">Descripcion</label>
-                            <input type="text" name="description" id="description" placeholder="Write a description" class="form-control" required>
+                            <label for="description" class="form-label">Descripción</label>
+                            <input type="text" name="description" id="description" placeholder="Ingrese la descripción" class="form-control" required>
                         </div>
                         <div class="mb-3">
-                            <label for="category" class="form-label">Categoria</label>
+                            <label for="category" class="form-label">Categoría</label>
                             <select name="category" id="category" class="form-control" required>
-                                <option value="category1">Category 1</option>
-                                <option value="category2">Category 2</option>
+                                <option value="category1">Categoría 1</option>
+                                <option value="category2">Categoría 2</option>
                                 <!-- Agrega más opciones según tus categorías -->
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Cantidad</label>
-                            <input type="number" name="quantity" id="quantity" placeholder="Enter the quantity" class="form-control" required>
+                            <input type="number" name="quantity" id="quantity" placeholder="Ingrese la cantidad" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="price" class="form-label">Precio</label>
-                            <input type="number" name="price" id="price" placeholder="Enter the price" class="form-control" required>
+                            <input type="number" name="price" id="price" placeholder="Ingrese el precio" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="image" class="form-label">Imagen</label>
-                            <input type="file" name="image" id="image" class="form-control" accept="image/*">
+                            <input type="file" name="image" id="image" class="form-control" accept="image/*" onchange="previewImage()">
+                            <img id="imagePreview" class="img-fluid mt-2" alt="Vista previa de la imagen">
+                        </div>
+                        <div class="mb-3">
+                            <label for="newCategory" class="form-label">Nueva Categoría</label>
+                            <input type="text" name="newCategory" id="newCategory" class="form-control">
                         </div>
 
-                        
+                        <button type="button" class="btn btn-primary btn-block" onclick="agregarNuevaCategoria()">
+                            Agregar Nueva Categoría
+                        </button>
+
                         <button type="submit" class="btn btn-success btn-block">
                             Guardar
                         </button>
@@ -46,3 +54,83 @@
         </div>
     </div>
 </div>
+
+<script>
+    // Función para obtener las categorías almacenadas en la cookie
+    function getStoredCategories() {
+        const storedCategories = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('categories='))
+            ?.split('=')[1];
+        
+        return storedCategories ? JSON.parse(storedCategories) : [];
+    }
+
+    // Función para guardar las categorías en la cookie
+    function saveCategoriesToCookie(categories) {
+        document.cookie = `categories=${JSON.stringify(categories)}`;
+    }
+
+    // Función para agregar una nueva categoría
+    function agregarNuevaCategoria() {
+        var nuevaCategoria = document.getElementById("newCategory").value;
+        var selectCategoria = document.getElementById("category");
+
+        // Obtén las categorías almacenadas en la cookie
+        var storedCategories = getStoredCategories();
+
+        // Verifica si la nueva categoría ya existe
+        var existe = storedCategories.includes(nuevaCategoria);
+
+        if (!existe && nuevaCategoria.trim() !== "") {
+            // Agrega la nueva categoría a las categorías almacenadas
+            storedCategories.push(nuevaCategoria);
+
+            // Actualiza la cookie con las nuevas categorías
+            saveCategoriesToCookie(storedCategories);
+
+            // Crea y agrega la opción al desplegable
+            var option = document.createElement("option");
+            option.text = nuevaCategoria;
+            option.value = nuevaCategoria;
+            selectCategoria.add(option);
+
+            // Opcional: Puedes limpiar el campo de nueva categoría después de agregarla
+            document.getElementById("newCategory").value = "";
+        } else {
+            alert("La categoría ya existe o el campo está vacío.");
+        }
+    }
+
+    // Llama a esta función cuando se cargue la página para llenar el desplegable con las categorías almacenadas
+    window.onload = function () {
+        var selectCategoria = document.getElementById("category");
+        var storedCategories = getStoredCategories();
+
+        storedCategories.forEach(category => {
+            var option = document.createElement("option");
+            option.text = category;
+            option.value = category;
+            selectCategoria.add(option);
+        });
+    }
+
+    // Función para previsualizar la imagen seleccionada
+    function previewImage() {
+        var input = document.getElementById('image');
+        var preview = document.getElementById('imagePreview');
+        
+        var file = input.files[0];
+        var reader = new FileReader();
+
+        reader.onloadend = function () {
+            preview.src = reader.result;
+        }
+
+        if (file) {
+            reader.readAsDataURL(file);
+        } else {
+            preview.src = "";
+        }
+    }
+</script>

@@ -1,14 +1,26 @@
-import mongoose from 'mongoose';
+// src/database.ts
+import mongoose, { ConnectOptions } from 'mongoose';
 
-async function connect() {
-    try {
-        await mongoose.connect('mongodb://127.0.0.1:27017/ts-app', {
-        
-        });
-        console.log('Conexión exitosa a la base de datos');
-    } catch (error) {
-        console.error('Error de conexión a la base de datos:', error);
+class Database {
+    private static instance: Database;
+
+    private constructor() {}
+
+    public static getInstance(): Database {
+        if (!Database.instance) {
+            Database.instance = new Database();
+        }
+        return Database.instance;
+    }
+
+    public async connect() {
+        try {
+            await mongoose.connect('mongodb://localhost/photo-gallery', {} as ConnectOptions);
+            console.log('Conexión exitosa a MongoDB');
+        } catch (error) {
+            console.error('Error de conexión a MongoDB:', error);
+        }
     }
 }
 
-export default connect;
+export default Database;

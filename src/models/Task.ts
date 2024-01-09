@@ -6,7 +6,8 @@ export interface ITask extends Document {
     description: string;
     category: string;
     quantity: number;
-    price: number; // Agrega el campo price
+    price: number;
+    image?: string; // Nuevo campo para la ruta de la imagen
     toPlainObject: () => Record<string, any>;
 }
 
@@ -31,9 +32,10 @@ const taskSchema = new Schema({
         default: 0,
     },
     price: {
-        type: Number, // Tipo de dato para el precio
-        required: true, // Indica que el precio es obligatorio
+        type: Number,
+        required: true,
     },
+    image: String, // Nueva propiedad para la ruta de la imagen
 });
 
 taskSchema.methods.toPlainObject = function (): Record<string, any> {
