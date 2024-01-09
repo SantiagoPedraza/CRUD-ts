@@ -17,10 +17,15 @@ comandos implemntados para todas las instalaciones de dependencias:
 -moongoose:npm install --save mongoose@^8.0.3
 -morgan:npm install --save morgan@^1.10.0
 -rumraf:npm install --save rimraf@^5.0.5
-
+-------------------------------------------------------------------------------------
+nuevos comandos:
+-npm install --save-dev @types/multer @types/uuid
+-npm install mongoose --save
+-npm install multer
 
 cada cambio que se haga se debe dejar de correr el programa con ctrl c y usar los comando:
 -npx tsc para que ts transcriba todo a js
 -npm run para arrancar de nuevo
+-npm install --save-dev @types/mongoose
  
  
