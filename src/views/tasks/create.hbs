@@ -31,11 +31,8 @@
                             <label for="price" class="form-label">Precio</label>
                             <input type="number" name="price" id="price" placeholder="Ingrese el precio" class="form-control" required>
                         </div>
-                        <div class="mb-3">
-                            <label for="image" class="form-label">Imagen</label>
-                            <input type="file" name="image" id="image" class="form-control" accept="image/*" onchange="previewImage()">
-                            <img id="imagePreview" class="img-fluid mt-2" alt="Vista previa de la imagen">
-                        </div>
+                        
+                        
                         <div class="mb-3">
                             <label for="newCategory" class="form-label">Nueva Categoría</label>
                             <input type="text" name="newCategory" id="newCategory" class="form-control">
@@ -54,7 +51,6 @@
         </div>
     </div>
 </div>
-
 <script>
     // Función para obtener las categorías almacenadas en la cookie
     function getStoredCategories() {

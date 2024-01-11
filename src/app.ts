@@ -1,4 +1,4 @@
-// app.ts
+
 import express from 'express';
 import exphbs, { create } from 'express-handlebars';
 import path from 'path';

@@ -1,5 +1,5 @@
-// models/Task.ts
-import { Schema, model, Document } from 'mongoose';
+
+import mongoose, { Document } from 'mongoose';
 
 export interface ITask extends Document {
     title: string;
@@ -7,41 +7,36 @@ export interface ITask extends Document {
     category: string;
     quantity: number;
     price: number;
-    image?: string; // Nuevo campo para la ruta de la imagen
-    toPlainObject: () => Record<string, any>;
+    imageUrl?: string; 
 }
 
-const taskSchema = new Schema({
+const taskSchema = new mongoose.Schema({
     title: {
         type: String,
         required: true,
-        lowercase: true,
     },
     description: {
         type: String,
         required: true,
-        lowercase: true,
     },
     category: {
         type: String,
         required: true,
-        lowercase: true,
     },
     quantity: {
         type: Number,
-        default: 0,
+        required: true,
     },
     price: {
         type: Number,
         required: true,
     },
-    image: String, // Nueva propiedad para la ruta de la imagen
+    imageUrl: {
+        type: String,
+        required: false, 
+    },
 });
 
-taskSchema.methods.toPlainObject = function (): Record<string, any> {
-    const { _id, ...object } = this.toObject();
-    object._id = _id.toString();
-    return object;
-};
+const Task = mongoose.model<ITask>('Task', taskSchema);
 
-export default model<ITask>('Task', taskSchema);
+export default Task;

@@ -6,7 +6,7 @@
                     <h4>Edit Task</h4>
                 </div>
                 <div class="card-body">
-                    <form action="/tasks/edit/{{task._id}}" method="post">
+                    <form action="/tasks/edit/{{task._id}}" method="post" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
                             <input type="text" name="title" value="{{task.title}}" id="title" placeholder="Write your title" class="form-control" autofocus required>
@@ -17,11 +17,7 @@
                         </div>
                         <div class="mb-3">
                             <label for="category" class="form-label">Category</label>
-                            <select name="category" id="category" class="form-control" required>
-                                <option value="category1" {{#ifEqual task.category "category1"}}selected{{/ifEqual}}>Category 1</option>
-                                <option value="category2" {{#ifEqual task.category "category2"}}selected{{/ifEqual}}>Category 2</option>
-                                <!-- Agrega más opciones según tus categorías -->
-                            </select>
+                            <input type="text" name="category" value="{{task.category}}" id="category" placeholder="Enter the category" class="form-control" required>
                         </div>
                         <div class="mb-3">
                             <label for="quantity" class="form-label">Quantity</label>

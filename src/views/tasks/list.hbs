@@ -1,26 +1,32 @@
-<!-- Agrega esto a la sección head de tu HTML -->
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.4.0/dist/jspdf.umd.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-<!-- Parte de la vista que muestra las tarjetas -->
 <div class="row" id="productCards">
     {{#each tasks}}
         <div class="col-md-3 mb-4" data-id="{{_id}}" data-category="{{category}}">
             <div class="card">
-                <img src="data:image/jpeg;base64,chorizo" alt="Imagen del producto" class="card-img-top">
+                <div class="image-input-container">
+                    <label for="imageInput{{_id}}"></label>
+                    <div class="input-group">
+                        <input type="text" id="imageInput{{_id}}" class="form-control image-input" placeholder="Ingrese la URL de la imagen">
+                        <button class="btn btn-primary add-image-button" data-id="{{_id}}">Agregar</button>
+                    </div>
+                </div>
+                <div class="image-preview">
+                    <img id="imagePreview{{_id}}" src="{{imageUrl}}" alt="Imagen del producto" class="card-img-top">
+                </div>
                 <div class="card-body">
                     <h3>{{#if title}}{{title}}{{else}}Title Not Found{{/if}}</h3>
-                    <p>{{#if description}}{{description}}{{else}}Description Not Found{{/if}}</p>
+                    
                     <p>Cantidad: <span class="quantity" data-id="{{_id}}">{{quantity}}</span></p>
-                    <p>Precio: $<span class="price" data-id="{{_id}}">{{price}}</span></p>
+                    
                     <button class="btn btn-primary detail-button" data-bs-toggle="modal" data-bs-target="#detailModal{{_id}}">Detalle</button>
                     <button class="btn btn-success quantity-increment" data-id="{{_id}}">+</button>
-                    <button class="btn btn-warning quantity-decrement" data-id="{{_id}}">-</button>
+                    <button class="btn btn-info quantity-decrement" data-id="{{_id}}">-</button>
                 </div>
             </div>
         </div>
 
-        <!-- Modal para mostrar los detalles del producto -->
         <div class="modal fade" id="detailModal{{_id}}" tabindex="-1" aria-labelledby="detailModalLabel{{_id}}" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -29,12 +35,10 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <!-- Contenido del modal, puedes agregar más detalles aquí -->
                         <p>Nombre: {{title}}</p>
                         <p>Descripción: {{description}}</p>
                         <p>Cantidad: {{quantity}}</p>
                         <p>Precio: ${{price}}</p>
-                        <!-- Agrega más campos según sea necesario -->
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
@@ -45,7 +49,6 @@
     {{/each}}
 </div>
 
-<!-- Parte de la vista que muestra la tabla -->
 <div class="container mt-5">
     <h2>Lista de Tareas</h2>
 
@@ -81,9 +84,7 @@
                     <td class="price" data-id="{{_id}}">${{price}}</td>
                     <td>
                         <a href="/tasks/edit/{{_id}}" class="btn btn-secondary">Editar</a>
-                        <!-- Mantén solo este botón de eliminar -->
                         <button class="btn btn-danger delete-button-table" data-id="{{_id}}">Eliminar</button>
-                        <!-- Eliminé el botón de PDF según tu solicitud -->
                     </td>
                 </tr>
             {{/each}}
@@ -91,9 +92,39 @@
     </table>
 </div>
 
-<!-- Script para manejar la eliminación de tareas, el filtrado y la actualización de la cantidad -->
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+   document.addEventListener('DOMContentLoaded', function () {
+    const addImageButtons = document.querySelectorAll('.add-image-button');
+    const imageInputs = document.querySelectorAll('.image-input');
+    const imagePreviews = document.querySelectorAll('.image-preview img');
+
+    addImageButtons.forEach(button => {
+        const taskId = button.getAttribute('data-id');
+        const storedImageUrl = localStorage.getItem(`image_${taskId}`);
+        if (storedImageUrl) {
+            const imagePreview = document.getElementById(`imagePreview${taskId}`);
+            imagePreview.src = storedImageUrl;
+        }
+    });
+
+    addImageButtons.forEach(button => {
+        button.addEventListener('click', async function (event) {
+            event.preventDefault();
+            const taskId = button.getAttribute('data-id');
+            const input = document.getElementById(`imageInput${taskId}`);
+            const imageUrl = input.value.trim();
+
+            const imagePreview = document.getElementById(`imagePreview${taskId}`);
+            imagePreview.src = imageUrl;
+
+            // Almacena la URL de la imagen en el localStorage
+            localStorage.setItem(`image_${taskId}`, imageUrl);
+
+            input.value = '';
+        });
+    });
+    
+
         const deleteButtons = document.querySelectorAll('.delete-button');
         const deleteButtonsCard = document.querySelectorAll('.delete-button-card');
         const deleteButtonsTable = document.querySelectorAll('.delete-button-table');
@@ -104,15 +135,10 @@
         const productCards = document.getElementById('productCards');
         const tableBody = document.getElementById('tableBody');
 
-        // Agrega el evento de envío del formulario de búsqueda en la barra de navegación
         searchForm.addEventListener('submit', function (event) {
             event.preventDefault();
             const searchTerm = searchQuery.value.trim().toLowerCase();
-
-            // Filtra las tarjetas
             filterProductCards(searchTerm);
-
-            // Filtra la tabla
             filterTableRows(searchTerm);
         });
 
@@ -184,10 +210,8 @@
 
         categoryFilter.addEventListener('change', function () {
             const selectedCategory = categoryFilter.value;
-
             tableRows.forEach(row => {
                 const category = row.getAttribute('data-category');
-
                 if (selectedCategory === 'all' || selectedCategory === category) {
                     row.style.display = '';
                 } else {
@@ -195,11 +219,9 @@
                 }
             });
 
-            // Filtra las tarjetas también
             const cards = productCards.querySelectorAll('.col-md-3');
             cards.forEach(card => {
                 const category = card.getAttribute('data-category');
-
                 if (selectedCategory === 'all' || selectedCategory === category) {
                     card.style.display = '';
                 } else {
@@ -218,9 +240,7 @@
                     });
 
                     if (response.ok) {
-                        // Elimina la fila de la tabla sin recargar la página
                         document.querySelector(`tr[data-id="${taskId}"]`).remove();
-                        // Elimina la tarjeta sin recargar la página
                         document.querySelector(`.col-md-3[data-id="${taskId}"]`).remove();
                     } else {
                         console.error('Error al eliminar la tarea. Status:', response.status);
@@ -233,7 +253,6 @@
 
         async function handleQuantityUpdate(taskId, action) {
             const currentQuantity = parseInt(document.querySelector(`.quantity[data-id="${taskId}"]`).innerText);
-
             const updateUrl = `/tasks/updateQuantity/${taskId}?quantity=${action === 'increment' ? currentQuantity + 1 : currentQuantity - 1}`;
 
             try {
@@ -243,9 +262,7 @@
 
                 if (response.ok) {
                     const updatedTask = await response.json();
-                    // Actualiza la cantidad en la tarjeta sin recargar la página
                     document.querySelector(`.quantity[data-id="${taskId}"]`).innerText = updatedTask.quantity;
-                    // Actualiza la cantidad en la tabla sin recargar la página
                     document.querySelector(`tr[data-id="${taskId}"] .quantity`).innerText = updatedTask.quantity;
                 } else {
                     console.error('Error al actualizar la cantidad. Status:', response.status);
@@ -257,7 +274,6 @@
     });
 </script>
 
-<!-- Agrega estas líneas al final de tu estilo en la sección head -->
 <style>
     .card {
         border: 1px solid #ddd;
@@ -311,7 +327,6 @@
         background-color: #0056b3;
         border-color: #0056b3;
     }
-
     .card-footer a.btn-success,
     .card-footer button.btn-success {
         color: #fff;
@@ -329,7 +344,7 @@
     .card-footer button.btn-warning {
         color: #fff;
         background-color: #ffc107;
-        border-color: #ffc107;
+        border-color: #070fff;
     }
 
     .card-footer a.btn-warning:hover,
@@ -346,4 +361,26 @@
     #taskTable td {
         color: #fff;
     }
+    .image-preview img {
+            width: 305px;
+            height: 250px;
+        }
+    .image-input-container {
+    margin-bottom: 10px; /* Ajustar el espacio entre el campo de entrada y el botón */
+}
+
+.input-group {
+    display: flex;
+}
+
+.image-input {
+    flex-grow: 1; /* El campo de entrada ocupa todo el espacio disponible */
+    border-top-right-radius: 0; /* Evitar esquinas redondeadas en el lado derecho del campo de entrada */
+    border-bottom-right-radius: 0;
+}
+
+.add-image-button {
+    border-top-left-radius: 0; /* Evitar esquinas redondeadas en el lado izquierdo del botón */
+    border-bottom-left-radius: 0;
+}
 </style>

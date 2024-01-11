@@ -1,4 +1,4 @@
-// src/database.ts
+
 import mongoose, { ConnectOptions } from 'mongoose';
 
 class Database {
