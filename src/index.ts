@@ -1,4 +1,4 @@
-
+// src/index.ts
 import App from './app';
 import Database from './database';
 

@@ -1,11 +1,9 @@
-
 import express from 'express';
-import exphbs, { create } from 'express-handlebars';
+import { create } from 'express-handlebars';
 import path from 'path';
+import Database from './database';
 import indexRoutes from './routes';
 import tasksRouter from './routes/tasks';
-import mongoose from 'mongoose';
-import Database from './database';
 
 class Application {
     app: express.Application;

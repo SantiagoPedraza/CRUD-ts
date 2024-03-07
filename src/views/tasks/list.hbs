@@ -276,14 +276,16 @@
 
 <style>
     .card {
-        border: 1px solid #000000;
+        border: 2px solid #001172; /* Cambia el grosor del borde y el color */
         border-radius: 15px;
         box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         transition: transform 0.3s ease-in-out;
+        height: 100%; /* Hace que todas las tarjetas tengan la misma altura */
     }
 
     .card:hover {
         transform: scale(1.05);
+        border-color: #28a745; /* Cambia el color del borde al pasar el cursor sobre la tarjeta */
     }
 
     .card-body {
@@ -327,6 +329,7 @@
         background-color: #0056b3;
         border-color: #0056b3;
     }
+
     .card-footer a.btn-success,
     .card-footer button.btn-success {
         color: #fff;
@@ -361,30 +364,32 @@
     #taskTable td {
         color: #001172;
     }
+
     .image-preview img {
-            width: 305px;
-            height: 250px;
-        }
+        max-width: 350px;
+        max-height: 250px;
+    }
+
     .image-input-container {
-    margin-bottom: 10px; /* Ajustar el espacio entre el campo de entrada y el botón */
-}
+        margin-bottom: 10px; /* Ajustar el espacio entre el campo de entrada y el botón */
+    }
 
-.input-group {
-    display: flex;
-}
+    .input-group {
+        display: flex;
+    }
 
-.image-input {
-    flex-grow: 1; /* El campo de entrada ocupa todo el espacio disponible */
-    border-top-right-radius: 0; /* Evitar esquinas redondeadas en el lado derecho del campo de entrada */
-    border-bottom-right-radius: 0;
-}
+    .image-input {
+        flex-grow: 1; /* El campo de entrada ocupa todo el espacio disponible */
+        border-top-right-radius: 0; /* Evitar esquinas redondeadas en el lado derecho del campo de entrada */
+        border-bottom-right-radius: 0;
+    }
 
-.add-image-button {
-    border-top-left-radius: 0; /* Evitar esquinas redondeadas en el lado izquierdo del botón */
-    border-bottom-left-radius: 0;
-}
+    .add-image-button {
+        border-top-left-radius: 0; /* Evitar esquinas redondeadas en el lado izquierdo del botón */
+        border-bottom-left-radius: 0;
+    }
 
-.quantity-increment:hover {
+    .quantity-increment:hover {
         background-color: #28a745; /* Color verde al pasar el cursor sobre el botón de incrementar */
         border-color: #28a745;
     }
@@ -400,4 +405,9 @@
         background-color: #dc3545; /* Color rojo al pasar el cursor sobre el botón de eliminar */
         border-color: #dc3545;
     }
+
+    .row .card {
+        height: 100%; /* Hace que todas las tarjetas dentro de una fila tengan la misma altura */
+    }
 </style>
+

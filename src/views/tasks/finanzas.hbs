@@ -1,0 +1,586 @@
+<div id="finanzas" class="container mt-5">
+        <h2>Finanzas</h2>
+        <div class="container mt-5"></div>
+
+        <div class="container mt-5">
+            <h2>Capital total</h2>
+            <div class="mt-3">
+                <h4>Filtrar por Categoría:</h4>
+                <select id="categoryFilter" class="form-select">
+                    <option value="all">Mostrar Todas</option>
+                    <option value="category1">Categoría 1</option>
+                    <option value="category2">Categoría 2</option>
+                </select>
+            </div>
+            <table id="taskTable1" class="table">
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Descripción</th>
+                        <th>Categoría</th>
+                        <th>Cantidad</th>
+                        <th>Precio</th>
+                        <th>Total</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody1">
+                    {{#each tasks}}
+                        <tr data-id="{{_id}}" data-category="{{category}}">
+                            <td>{{#if title}}{{title}}{{else}}Nombre No Encontrado{{/if}}</td>
+                            <td>{{#if description}}{{description}}{{else}}Descripción No Encontrada{{/if}}</td>
+                            <td>{{category}}</td>
+                            <td class="quantity" data-id="{{_id}}">{{quantity}}</td>
+                            <td class="price" data-id="{{_id}}">${{price}}</td>
+                            <td class="total" data-id="{{_id}}">${{quantity}} * ${{price}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+            </table>
+            <p id="totalFinanzas">Total de Activos: $0.00</p>
+        </div>
+
+       <div id="ganancias" class="container mt-5">
+            <div class="container mt-5"></div>
+
+            <div class="container mt-5">
+                <h2>Ganancias</h2>
+                <div class="mt-3">
+                    <h4>Filtrar por Categoría:</h4>
+                    <select id="categoryFilter2" class="form-select">
+                        <option value="all">Mostrar Todas</option>
+                        <option value="category1">Categoría 1</option>
+                        <option value="category2">Categoría 2</option>
+                    </select>
+                </div>
+                <table id="taskTable2" class="table">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Descripción</th>
+                            <th>Categoría</th>
+                            <th>Cantidad</th>
+                            <th>Precio</th>
+                            <th>Total</th>
+                            <th>Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody2">
+                        {{#each tasks}}
+                            <tr data-id="{{_id}}" data-category="{{category}}">
+                                <td>{{#if title}}{{title}}{{else}}Nombre No Encontrado{{/if}}</td>
+                                <td>{{#if description}}{{description}}{{else}}Descripción No Encontrada{{/if}}</td>
+                                <td>{{category}}</td>
+                                <td class="quantity" data-id="{{_id}}">0</td>
+                                <td class="price" data-id="{{_id}}">${{price}}</td>
+                                <td class="total" data-id="{{_id}}">${{quantity}} * ${{price}}</td>
+                                <td>
+                                    <button class="btn btn-primary simulate-sale-button" data-id="{{_id}}">Simular Venta</button>
+                                    
+                                   
+                                </td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                </table>
+                <p id="totalGanancias">Total de Ganancias: $0.00</p>
+            </div>
+        </div>  
+    </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const addImageButtons = document.querySelectorAll('.add-image-button');
+        const imageInputs = document.querySelectorAll('.image-input');
+        const imagePreviews = document.querySelectorAll('.image-preview img');
+
+         function calculateAndShowTotalFinanzas() {
+        const totalFinanzasElement = document.getElementById('totalFinanzas');
+        const tableRows = document.querySelectorAll('#taskTable1 tbody tr'); // Selecciona las filas de la tabla de Capital Total
+        let totalFinanzas = 0;
+
+        tableRows.forEach(row => {
+            const totalText = row.querySelector('.total').innerText;
+            const totalValue = parseFloat(totalText.replace('$', '')); // Elimina el símbolo '$' y convierte el texto a número
+            totalFinanzas += totalValue;
+        });
+
+        // Actualiza el contenido del elemento <p> con la suma calculada
+        totalFinanzasElement.innerText = `Total de Activos: $${totalFinanzas.toFixed(2)}`;
+    }
+
+    // Llama a la función para calcular y mostrar el total de activos al cargar el contenido del DOM
+    calculateAndShowTotalFinanzas();
+
+        addImageButtons.forEach(button => {
+            const taskId = button.getAttribute('data-id');
+            const storedImageUrl = localStorage.getItem(`image_${taskId}`);
+            if (storedImageUrl) {
+                const imagePreview = document.getElementById(`imagePreview${taskId}`);
+                imagePreview.src = storedImageUrl;
+            }
+        });
+
+        addImageButtons.forEach(button => {
+            button.addEventListener('click', async function (event) {
+                event.preventDefault();
+                const taskId = button.getAttribute('data-id');
+                const input = document.getElementById(`imageInput${taskId}`);
+                const imageUrl = input.value.trim();
+
+                const imagePreview = document.getElementById(`imagePreview${taskId}`);
+                imagePreview.src = imageUrl;
+
+                // Almacena la URL de la imagen en el localStorage
+                localStorage.setItem(`image_${taskId}`, imageUrl);
+
+                input.value = '';
+            });
+        });
+
+        const categoryFilter = document.getElementById('categoryFilter');
+        const tableRows = document.querySelectorAll('tbody tr');
+        const searchForm = document.getElementById('searchForm');
+        const searchQuery = document.getElementById('searchQuery');
+        const tableBody = document.getElementById('tableBody');
+
+        searchForm.addEventListener('submit', function (event) {
+            event.preventDefault();
+            const searchTerm = searchQuery.value.trim().toLowerCase();
+            filterTableRows(searchTerm);
+        });
+
+        function filterTableRows(searchTerm) {
+            tableRows.forEach(row => {
+                const title = row.querySelector('td:first-child').textContent.trim().toLowerCase();
+                if (title.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        }
+
+        categoryFilter.addEventListener('change', function () {
+            const selectedCategory = categoryFilter.value;
+            tableRows.forEach(row => {
+                const category = row.getAttribute('data-category');
+                if (selectedCategory === 'all' || selectedCategory === category) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+
+        const incrementButtons = document.querySelectorAll('.quantity-increment');
+        const decrementButtons = document.querySelectorAll('.quantity-decrement');
+
+        incrementButtons.forEach(button => {
+            button.addEventListener('click', async function (event) {
+                event.preventDefault();
+                const taskId = button.getAttribute('data-id');
+                await handleQuantityUpdate(taskId, 'increment');
+            });
+        });
+
+        decrementButtons.forEach(button => {
+            button.addEventListener('click', async function (event) {
+                event.preventDefault();
+                const taskId = button.getAttribute('data-id');
+                await handleQuantityUpdate(taskId, 'decrement');
+            });
+        });
+
+        async function handleQuantityUpdate(taskId, action) {
+            const currentQuantity = parseInt(document.querySelector(`.quantity[data-id="${taskId}"]`).innerText);
+            const updateUrl = `/tasks/updateQuantity/${taskId}?quantity=${action === 'increment' ? currentQuantity + 1 : currentQuantity - 1}`;
+
+            try {
+                const response = await fetch(updateUrl, {
+                    method: 'PUT',
+                });
+
+                if (response.ok) {
+                    const updatedTask = await response.json();
+                    document.querySelector(`.quantity[data-id="${taskId}"]`).innerText = updatedTask.quantity;
+                    document.querySelector(`tr[data-id="${taskId}"] .quantity`).innerText = updatedTask.quantity;
+
+                    // Calcular el total y actualizar en la columna correspondiente
+                    calculateTotal(taskId);
+                    calculateTotalOfTotals();
+                } else {
+                    console.error('Error al actualizar la cantidad. Status:', response.status);
+                }
+            } catch (error) {
+                console.error('Error de red:', error);
+            }
+        }
+
+        // Función para calcular el total y mostrarlo en la columna correspondiente
+        function calculateTotal(taskId) {
+    const quantity = parseInt(document.querySelector(`.quantity[data-id="${taskId}"]`).innerText);
+    const price = parseFloat(document.querySelector(`.price[data-id="${taskId}"]`).innerText.replace('$', ''));
+    const total = quantity * price;
+
+    console.log(`Cantidad: ${quantity}, Precio: ${price}, Total: ${total}`); // Agregar esta línea
+
+    document.querySelector(`.total[data-id="${taskId}"]`).innerText = `$${total.toFixed(2)}`;
+}
+
+
+        // Llamada a la función calculateTotal cuando se inicia el DOMContentLoaded
+        document.querySelectorAll('.total').forEach(totalElement => {
+            const taskId = totalElement.getAttribute('data-id');
+            calculateTotal(taskId);
+        });
+
+        // Función para calcular el total de todos los totales y mostrarlo en una nueva fila al final de la tabla
+        function calculateTotalOfTotals() {
+    let totalOfTotals = 0;
+
+    tableRows.forEach(row => {
+        const totalText = row.querySelector('.total').innerText;
+        const totalValue = parseFloat(totalText.replace('$', ''));
+        totalOfTotals += totalValue;
+    });
+
+    // Actualizar el contenido del elemento <p> con la suma calculada
+    const totalFinanzasElement = document.getElementById('totalFinanzas');
+    totalFinanzasElement.innerText = `Total de Activos: $${totalOfTotals.toFixed(2)}`;
+}
+
+
+        // Llamada a la función calculateTotalOfTotals cuando se inicia el DOMContentLoaded
+        calculateTotalOfTotals();
+
+        const editButtons = document.querySelectorAll('.btn-secondary');
+        const deleteButtons = document.querySelectorAll('.delete-button-table');
+
+        editButtons.forEach(button => button.remove());
+        deleteButtons.forEach(button => button.remove());
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const gananciasTableRows = document.querySelectorAll('#ganancias tbody tr');
+
+        function calculateTotalOfGanancias() {
+            let totalOfGanancias = 0;
+
+            gananciasTableRows.forEach(row => {
+                const quantity = parseInt(row.querySelector('.quantity').innerText);
+                const price = parseFloat(row.querySelector('.price').innerText.replace('$', ''));
+                const total = price * quantity; // Total de ganancias por producto
+
+                totalOfGanancias += total;
+
+                // Actualizar el total para esta fila en la columna Total
+                row.querySelector('.total').innerText = `$${total.toFixed(2)}`;
+            });
+
+            // Actualiza el total de ganancias en algún elemento en tu página
+            // Por ejemplo:
+            const totalGananciasElement = document.getElementById('totalGanancias');
+            totalGananciasElement.innerText = `$${totalOfGanancias.toFixed(2)}`;
+
+            // Guardar los datos en el almacenamiento local
+            localStorage.setItem('gananciasData', JSON.stringify(getGananciasData()));
+        }
+
+        // Función para obtener los datos de ganancias de la tabla
+        function getGananciasData() {
+            const data = [];
+            gananciasTableRows.forEach(row => {
+                const taskId = row.getAttribute('data-id');
+                const quantity = parseInt(row.querySelector('.quantity').innerText);
+                data.push({ taskId, quantity });
+            });
+            return data;
+        }
+
+        // Función para cargar los datos de ganancias desde el almacenamiento local
+        function loadGananciasData() {
+            const gananciasData = JSON.parse(localStorage.getItem('gananciasData'));
+            if (gananciasData) {
+                gananciasData.forEach(item => {
+                    const row = document.querySelector(`#ganancias tbody tr[data-id="${item.taskId}"]`);
+                    if (row) {
+                        row.querySelector('.quantity').innerText = item.quantity;
+                    }
+                });
+                calculateTotalOfGanancias(); // Recalcular los totales después de cargar los datos
+            }
+        }
+
+        loadGananciasData(); // Cargar los datos al cargar la página
+
+        const simulateSaleButtons = document.querySelectorAll('.simulate-sale-button');
+
+        simulateSaleButtons.forEach(button => {
+            button.addEventListener('click', function (event) {
+                event.preventDefault();
+                const taskId = button.getAttribute('data-id');
+                simulateSale(taskId);
+            });
+            button.addEventListener('mouseover', function () {
+                button.style.backgroundColor = 'rgba(40, 167, 69, 0.7)'; // Verde más claro y transparente
+            });
+            button.addEventListener('mouseout', function () {
+                button.style.backgroundColor = ''; // Restablece el color cuando el ratón sale del botón
+            });
+
+            const cancelButton = document.createElement('button');
+            cancelButton.className = 'btn btn-danger cancel-sale-button';
+            cancelButton.innerText = 'X';
+            cancelButton.style.color = 'white';
+            cancelButton.style.backgroundColor = 'rgba(255, 0, 0, 0.7)'; // Rojo más claro y transparente
+
+            cancelButton.addEventListener('click', function (event) {
+                event.preventDefault();
+                const taskId = button.getAttribute('data-id');
+                cancelSale(taskId);
+            });
+            button.parentNode.insertBefore(cancelButton, button.nextSibling);
+            
+            // Agregar el evento de cambio de color al pasar el ratón sobre el botón X
+            cancelButton.addEventListener('mouseover', function () {
+                cancelButton.style.backgroundColor = 'red'; // Cambia el color al pasar el ratón
+            });
+            cancelButton.addEventListener('mouseout', function () {
+                cancelButton.style.backgroundColor = ''; // Restablece el color cuando el ratón sale del botón
+            });
+        });
+
+        function simulateSale(taskId) {
+            const row = document.querySelector(`#ganancias tbody tr[data-id="${taskId}"]`);
+            const quantityElement = row.querySelector('.quantity');
+            let currentQuantity = parseInt(quantityElement.innerText);
+
+            currentQuantity++; // Incrementar la cantidad en 1
+
+            quantityElement.innerText = currentQuantity;
+
+            const price = parseFloat(row.querySelector('.price').innerText.replace('$', ''));
+            const total = price * currentQuantity; // Total basado en la cantidad actualizada
+            row.querySelector('.total').innerText = `$${total.toFixed(2)}`;
+
+            calculateTotalOfGanancias();
+        }
+
+        function cancelSale(taskId) {
+            if (confirm('¿Estás seguro de cancelar la venta?')) {
+                const row = document.querySelector(`#ganancias tbody tr[data-id="${taskId}"]`);
+                const quantityElement = row.querySelector('.quantity');
+                let currentQuantity = parseInt(quantityElement.innerText);
+
+                if (currentQuantity > 0) {
+                    currentQuantity--; // Decrementar la cantidad en 1
+                    quantityElement.innerText = currentQuantity;
+
+                    const price = parseFloat(row.querySelector('.price').innerText.replace('$', ''));
+                    const total = price * currentQuantity; // Total basado en la cantidad actualizada
+                    row.querySelector('.total').innerText = `$${total.toFixed(2)}`;
+
+                    calculateTotalOfGanancias();
+                } else {
+                    alert('No se puede cancelar la venta porque la cantidad es 0.');
+                }
+            }
+        }
+    });
+</script>
+
+
+
+
+<style>
+    .card {
+        border: 2px solid #001172; /* Cambia el grosor del borde y el color */
+        border-radius: 15px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        transition: transform 0.3s ease-in-out;
+        height: 100%; /* Hace que todas las tarjetas tengan la misma altura */
+    }
+
+    .card:hover {
+        transform: scale(1.05);
+        border-color: #28a745; /* Cambia el color del borde al pasar el cursor sobre la tarjeta */
+    }
+
+    .card-body {
+        padding: 20px;
+    }
+
+    .card h3 {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        color: #001172;
+    }
+
+    .card p {
+        font-size: 1rem;
+        color: #001172;
+    }
+
+    .card-footer {
+        padding: 10px;
+        background-color: #343a40;
+        border-top: 1px solid #ddd;
+        border-bottom-left-radius: 15px;
+        border-bottom-right-radius: 15px;
+    }
+
+    .card-footer a,
+    .card-footer button {
+        margin-right: 10px;
+        border-radius: 8px;
+    }
+
+    .card-footer a.btn-primary,
+    .card-footer button.btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .card-footer a.btn-primary:hover,
+    .card-footer button.btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+
+    .card-footer a.btn-success,
+    .card-footer button.btn-success {
+        color: #fff;
+        background-color: #28a745;
+        border-color: #28a745;
+    }
+
+    .card-footer a.btn-success:hover,
+    .card-footer button.btn-success:hover {
+        background-color: #218838;
+        border-color: #218838;
+    }
+
+    .card-footer a.btn-warning,
+    .card-footer button.btn-warning {
+        color: #fff;
+        background-color: #ffc107;
+        border-color: #070fff;
+    }
+
+    .card-footer a.btn-warning:hover,
+    .card-footer button.btn-warning:hover {
+        background-color: #d39e00;
+        border-color: #d39e00;
+    }
+
+    #taskTable {
+        color: #001172;
+    }
+
+    #taskTable th,
+    #taskTable td {
+        color: #001172;
+    }
+
+    .image-preview img {
+        max-width: 350px;
+        max-height: 250px;
+    }
+
+    .image-input-container {
+        margin-bottom: 10px; /* Ajustar el espacio entre el campo de entrada y el botón */
+    }
+
+    .input-group {
+        display: flex;
+    }
+
+    .image-input {
+        flex-grow: 1; /* El campo de entrada ocupa todo el espacio disponible */
+        border-top-right-radius: 0; /* Evitar esquinas redondeadas en el lado derecho del campo de entrada */
+        border-bottom-right-radius: 0;
+    }
+
+    .add-image-button {
+        border-top-left-radius: 0; /* Evitar esquinas redondeadas en el lado izquierdo del botón */
+        border-bottom-left-radius: 0;
+    }
+
+    .quantity-increment:hover {
+        background-color: #28a745; /* Color verde al pasar el cursor sobre el botón de incrementar */
+        border-color: #28a745;
+    }
+
+    .quantity-decrement:hover {
+        background-color: #dc3545; /* Color rojo al pasar el cursor sobre el botón de decrementar */
+        border-color: #dc3545;
+    }
+
+    .delete-button:hover,
+    .delete-button-card:hover,
+    .delete-button-table:hover {
+        background-color: #dc3545; /* Color rojo al pasar el cursor sobre el botón de eliminar */
+        border-color: #dc3545;
+    }
+
+    .row .card {
+        height: 100%; /* Hace que todas las tarjetas dentro de una fila tengan la misma altura */
+    }
+    #taskTable1, #taskTable2 {
+            color: #333; /* Color del texto */
+            border-collapse: collapse; /* Colapsa los bordes de la tabla */
+            width: 100%; /* Ancho de la tabla */
+        }
+
+        #taskTable1 th, #taskTable1 td, #taskTable2 th, #taskTable2 td {
+            border: 2px solid #001172; /* Cambia el color del borde a negro o azul oscuro */
+            padding: 10px; /* Espaciado interno */
+            text-align: left; /* Alineación del texto */
+        }
+
+        #taskTable1 th, #taskTable2 th {
+            background-color: #f2f2f2; /* Color de fondo del encabezado */
+            color: #333; /* Color del texto del encabezado */
+        }
+
+        #taskTable1 tr:nth-child(even), #taskTable2 tr:nth-child(even) {
+            background-color: #f2f2f2; /* Color de fondo de las filas pares */
+        }
+
+        #taskTable1 tr:hover, #taskTable2 tr:hover {
+            background-color: #ddd; /* Color de fondo al pasar el cursor sobre una fila */
+        }
+
+        #taskTable1 th:first-child, #taskTable1 td:first-child,
+        #taskTable2 th:first-child, #taskTable2 td:first-child {
+            border-left: 2px solid #001172; /* Borde izquierdo */
+        }
+
+        #taskTable1 th:last-child, #taskTable1 td:last-child,
+        #taskTable2 th:last-child, #taskTable2 td:last-child {
+            border-right: 2px solid #001172; /* Borde derecho */
+        }
+
+        #taskTable1 tr:first-child th, #taskTable1 tr:first-child td,
+        #taskTable2 tr:first-child th, #taskTable2 tr:first-child td {
+            border-top: 2px solid #001172; /* Borde superior de la primera fila */
+        }
+
+        #taskTable1 tr:last-child th, #taskTable1 tr:last-child td,
+        #taskTable2 tr:last-child th, #taskTable2 tr:last-child td {
+            border-bottom: 2px solid #001172; /* Borde inferior de la última fila */
+        }
+    #totalGanancias,
+    #totalFinanzas {
+        color: #001172; /* Cambia el color del texto a azul oscuro */
+    }
+    .simulate-sale-button {
+        color: black; /* Cambia el color del texto a negro */
+    }
+
+</style>
+
+

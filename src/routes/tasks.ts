@@ -1,4 +1,4 @@
-import express, { Router, Request, Response } from 'express';
+import express, { Request, Response, Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import Task, { ITask } from '../models/Task';
@@ -6,7 +6,7 @@ import Task, { ITask } from '../models/Task';
 const tasksRouter = Router();
 const upload = multer({ dest: 'uploads/' });
 
-const publicPath = path.join(__dirname, 'public');
+const publicPath = path.join(__dirname, '../public'); // Corrección en la ruta pública
 
 tasksRouter.use(express.urlencoded({ extended: true }));
 tasksRouter.use(express.json());
@@ -77,7 +77,7 @@ tasksRouter.route('/delete/:id')
         }
     });
 
-tasksRouter.route('/edit/:id')
+    tasksRouter.route('/edit/:id')
     .get(async (req: Request, res: Response) => {
         try {
             const { id } = req.params;
@@ -93,7 +93,7 @@ tasksRouter.route('/edit/:id')
             res.status(500).send('Error interno del servidor');
         }
     })
-    .post(async (req: Request, res: Response) => {
+     .post(async (req: Request, res: Response) => {
         const { id } = req.params;
         const { title, description, category, quantity, price } = req.body;
         await Task.findByIdAndUpdate(id, { title, description, category, quantity, price });
@@ -115,6 +115,31 @@ tasksRouter.route('/updateQuantity/:id')
         } catch (error) {
             console.error('Error al ajustar la cantidad:', error);
             res.status(500).json({ error: 'Error interno del servidor' });
+        }
+    });
+
+    tasksRouter.route('/finanzas')
+    .get(async (req: Request, res: Response) => {
+        try {
+            const { categoryFilter } = req.query;
+            const tasks = await Task.find() as ITask[];
+            const uniqueCategories: string[] = [...new Set(tasks.map(task => task.category))];
+            let filteredTasks: ITask[] = tasks;
+
+            if (categoryFilter && categoryFilter !== 'all') {
+                filteredTasks = tasks.filter(task => task.category === categoryFilter) as ITask[];
+            }
+
+            const tasksAsPlainObjects = filteredTasks.map(task => task.toObject());
+
+            res.render('tasks/finanzas', {
+                tasks: tasksAsPlainObjects,
+                selectedCategory: categoryFilter,
+                uniqueCategories,
+            });
+        } catch (error) {
+            console.error('Error al obtener las tareas:', error);
+            res.status(500).send('Error interno del servidor');
         }
     });
 
